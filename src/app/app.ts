@@ -1,9 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, Injectable } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { signal } from '@angular/core';
-
-let readings_count = signal(0);
-let to_get_readings = signal(true);
+import { HttpClient } from '@angular/common/http';
 
 // Readings class to store sensor readings
 class reading {
@@ -11,16 +9,16 @@ class reading {
   temperature: Number;
   pressure: Number;
   humidity: Number;
-  co2ppm: Number;
+  co2Ppm: Number;
   tvoc: Number;
 
   constructor(time: String, temperature: Number, pressure: Number, humidity: Number, 
-      co2ppm: Number, tvoc: Number) {
+      co2Ppm: Number, tvoc: Number) {
     this.time = time;
     this.temperature = temperature;
     this.pressure = pressure;
     this.humidity = humidity;
-    this.co2ppm = co2ppm;
+    this.co2Ppm = co2Ppm;
     this.tvoc = tvoc;    
   }
 }
@@ -38,6 +36,8 @@ class reading {
       <th>Temperature</th>
       <th>Pressure</th>
       <th>Humidity</th>
+      <th>CO2 (ppm)</th>
+      <th>TVOC</th>
   </tr>
     @for (reading of readings; track reading.time) {
       <tr>
@@ -45,6 +45,8 @@ class reading {
         <td>{{ reading.temperature }}</td>
         <td>{{ reading.pressure }}</td>
         <td>{{ reading.humidity }}</td>
+        <td>{{ reading.co2Ppm }}</td>
+        <td>{{ reading.tvoc }}</td>
     </tr>
     }
   </tbody>
@@ -52,12 +54,21 @@ class reading {
   `,
   styleUrl: './app.css'
 })
+@Injectable({providedIn: 'root'})
 export class ReadingsList {
+  private http = inject(HttpClient);
   readings: Array<reading> = [];
 
   getReadings() {
-    let new_reading = new reading("tda", 514, 751, 1725, 715, 816);
-    this.readings.push(new_reading);
+    this.readings = [];
+    this.http.get<Array<reading>>('http://localhost:8080/reading')
+        .subscribe((subscriber) => {
+          for (let i = 0; i < subscriber.length; i++) {
+            let new_reading = new reading(subscriber[i].time, subscriber[i].temperature, 
+              subscriber[i].pressure, subscriber[i].humidity, subscriber[i].co2Ppm, subscriber[i].tvoc);  
+            this.readings.push(new_reading)
+            }
+        });
   }
 }
 

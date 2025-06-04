@@ -22,10 +22,13 @@ app-readings {
     font-size: medium;
     padding-top: 5px;
     table-layout: fixed;
-    background-color: aquamarine;
 }
 
 th {
     border-width: 5px;
     background-color: beige;
+}
+
+tr {
+    text-align: center;
 }
