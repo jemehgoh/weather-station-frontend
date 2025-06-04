@@ -61,7 +61,7 @@ export class ReadingsList {
 
   getReadings() {
     this.readings = [];
-    this.http.get<Array<reading>>('http://localhost:8080/reading')
+    this.http.get<Array<reading>>('http://localhost:8080/readings')
         .subscribe((subscriber) => {
           for (let i = 0; i < subscriber.length; i++) {
             let new_reading = new reading(subscriber[i].time, subscriber[i].temperature, 
@@ -75,7 +75,6 @@ export class ReadingsList {
 @Component({
   selector: 'app-root',
   imports: [ReadingsList],
-  // templateUrl: './app.html',
   template: `
   <h1>ESP32 Weather Station</h1>
   <!-- <readings-selector /> -->
